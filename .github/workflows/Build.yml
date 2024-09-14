@@ -4,6 +4,13 @@ on:
     branches: ['main']
   pull_request:
   workflow_dispatch:
+concurrency:
+  group: build
+  cancel-in-progress: true
+permissions:
+  # Both required by actions/deploy-pages
+  pages: write
+  id-token: write
 jobs:
   build:
     name: Build
@@ -15,7 +22,7 @@ jobs:
 
       # ----------------------------------------------------------------------- Restore library cache
       - name: Restore library cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: Library
           key: Library-${{hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**')}}
@@ -41,12 +48,12 @@ jobs:
         with:
           name: Build-WebGL
           if-no-files-found: error
-          path: Build
+          path: Build/WebGL/WebGL/
 
       - name: Collect GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: Build
+          path: Build/WebGL/WebGL/
 
       # ----------------------------------------------------------------------- Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
